@@ -56,8 +56,7 @@ def inception_v1_base(inputs,
   with tf.variable_scope(scope, 'InceptionV1', [inputs]):
     with slim.arg_scope(
         [slim.conv2d, slim.fully_connected],
-        weights_initializer=trunc_normal(0.01),
-        data_format="NCHW"):
+        weights_initializer=trunc_normal(0.01)):
       with slim.arg_scope([slim.conv2d, slim.max_pool2d],
                           stride=1, padding='SAME',
                           data_format="NCHW"):
@@ -93,7 +92,7 @@ def inception_v1_base(inputs,
             branch_2 = slim.conv2d(net, 16, [1, 1], scope='Conv2d_0a_1x1')
             branch_2 = slim.conv2d(branch_2, 32, [3, 3], scope='Conv2d_0b_3x3')
           with tf.variable_scope('Branch_3'):
-            branch_3 = slim.max_pool2d(net, [3, 3], scope='MaxPool_0a_3x3')
+            branch_3 = slim.max_pool2d(net, [3, 3], scope='MaxPool_0a_3x3', data_format="NCHW")
             branch_3 = slim.conv2d(branch_3, 32, [1, 1], scope='Conv2d_0b_1x1')
           net = tf.concat(axis=1, values=[branch_0, branch_1, branch_2, branch_3])
         end_points[end_point] = net
@@ -287,15 +286,15 @@ def inception_v1(inputs,
   # Final pooling and prediction
   with tf.variable_scope(scope, 'InceptionV1', [inputs, num_classes],
                          reuse=reuse) as scope:
-    with slim.arg_scope([slim.batch_norm, slim.dropout],
-                        is_training=is_training):
+    with slim.arg_scope([slim.avg_pool2d, slim.conv2d],
+                        data_format="NCHW"):
       net, end_points = inception_v1_base(inputs, scope=scope)
       with tf.variable_scope('Logits'):
-        net = slim.avg_pool2d(net, [7, 7], stride=1, scope='AvgPool_0a_7x7', data_format="NCHW")
+        net = slim.avg_pool2d(net, [7, 7], stride=1, scope='AvgPool_0a_7x7')
         net = slim.dropout(net,
-                           dropout_keep_prob, scope='Dropout_0b')
+                           dropout_keep_prob, scope='Dropout_0b', is_training=True)
         logits = slim.conv2d(net, num_classes, [1, 1], activation_fn=None,
-                             normalizer_fn=None, scope='Conv2d_0c_1x1', data_format="NCHW")
+                             normalizer_fn=None, scope='Conv2d_0c_1x1')
         if spatial_squeeze:
           logits = tf.squeeze(logits, [2, 3], name='SpatialSqueeze')
 

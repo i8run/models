@@ -98,9 +98,9 @@ def run_benchmark():
     # Note that our padding definition is slightly different the cuda-convnet.
     # In order to force the model to start with the same activations sizes,
     # we add 3 to the image_size and employ VALID padding above.
-    images = tf.Variable(tf.random_normal([FLAGS.batch_size,
+    images = tf.Variable(tf.random_normal([FLAGS.batch_size, 3,
                                            image_size,
-                                           image_size, 3],
+                                           image_size],
                                           dtype=tf.float32,
                                           stddev=1e-1), trainable=False)
 
