@@ -56,9 +56,11 @@ def inception_v1_base(inputs,
   with tf.variable_scope(scope, 'InceptionV1', [inputs]):
     with slim.arg_scope(
         [slim.conv2d, slim.fully_connected],
-        weights_initializer=trunc_normal(0.01)):
+        weights_initializer=trunc_normal(0.01),
+        data_format="NCHW"):
       with slim.arg_scope([slim.conv2d, slim.max_pool2d],
-                          stride=1, padding='SAME'):
+                          stride=1, padding='SAME',
+                          data_format="NCHW"):
         end_point = 'Conv2d_1a_7x7'
         net = slim.conv2d(inputs, 64, [7, 7], stride=2, scope=end_point)
         end_points[end_point] = net
@@ -93,7 +95,7 @@ def inception_v1_base(inputs,
           with tf.variable_scope('Branch_3'):
             branch_3 = slim.max_pool2d(net, [3, 3], scope='MaxPool_0a_3x3')
             branch_3 = slim.conv2d(branch_3, 32, [1, 1], scope='Conv2d_0b_1x1')
-          net = tf.concat(axis=3, values=[branch_0, branch_1, branch_2, branch_3])
+          net = tf.concat(axis=1, values=[branch_0, branch_1, branch_2, branch_3])
         end_points[end_point] = net
         if final_endpoint == end_point: return net, end_points
 
@@ -110,7 +112,7 @@ def inception_v1_base(inputs,
           with tf.variable_scope('Branch_3'):
             branch_3 = slim.max_pool2d(net, [3, 3], scope='MaxPool_0a_3x3')
             branch_3 = slim.conv2d(branch_3, 64, [1, 1], scope='Conv2d_0b_1x1')
-          net = tf.concat(axis=3, values=[branch_0, branch_1, branch_2, branch_3])
+          net = tf.concat(axis=1, values=[branch_0, branch_1, branch_2, branch_3])
         end_points[end_point] = net
         if final_endpoint == end_point: return net, end_points
 
@@ -132,7 +134,7 @@ def inception_v1_base(inputs,
           with tf.variable_scope('Branch_3'):
             branch_3 = slim.max_pool2d(net, [3, 3], scope='MaxPool_0a_3x3')
             branch_3 = slim.conv2d(branch_3, 64, [1, 1], scope='Conv2d_0b_1x1')
-          net = tf.concat(axis=3, values=[branch_0, branch_1, branch_2, branch_3])
+          net = tf.concat(axis=1, values=[branch_0, branch_1, branch_2, branch_3])
         end_points[end_point] = net
         if final_endpoint == end_point: return net, end_points
 
@@ -149,7 +151,7 @@ def inception_v1_base(inputs,
           with tf.variable_scope('Branch_3'):
             branch_3 = slim.max_pool2d(net, [3, 3], scope='MaxPool_0a_3x3')
             branch_3 = slim.conv2d(branch_3, 64, [1, 1], scope='Conv2d_0b_1x1')
-          net = tf.concat(axis=3, values=[branch_0, branch_1, branch_2, branch_3])
+          net = tf.concat(axis=1, values=[branch_0, branch_1, branch_2, branch_3])
         end_points[end_point] = net
         if final_endpoint == end_point: return net, end_points
 
@@ -166,7 +168,7 @@ def inception_v1_base(inputs,
           with tf.variable_scope('Branch_3'):
             branch_3 = slim.max_pool2d(net, [3, 3], scope='MaxPool_0a_3x3')
             branch_3 = slim.conv2d(branch_3, 64, [1, 1], scope='Conv2d_0b_1x1')
-          net = tf.concat(axis=3, values=[branch_0, branch_1, branch_2, branch_3])
+          net = tf.concat(axis=1, values=[branch_0, branch_1, branch_2, branch_3])
         end_points[end_point] = net
         if final_endpoint == end_point: return net, end_points
 
@@ -183,7 +185,7 @@ def inception_v1_base(inputs,
           with tf.variable_scope('Branch_3'):
             branch_3 = slim.max_pool2d(net, [3, 3], scope='MaxPool_0a_3x3')
             branch_3 = slim.conv2d(branch_3, 64, [1, 1], scope='Conv2d_0b_1x1')
-          net = tf.concat(axis=3, values=[branch_0, branch_1, branch_2, branch_3])
+          net = tf.concat(axis=1, values=[branch_0, branch_1, branch_2, branch_3])
         end_points[end_point] = net
         if final_endpoint == end_point: return net, end_points
 
@@ -200,7 +202,7 @@ def inception_v1_base(inputs,
           with tf.variable_scope('Branch_3'):
             branch_3 = slim.max_pool2d(net, [3, 3], scope='MaxPool_0a_3x3')
             branch_3 = slim.conv2d(branch_3, 128, [1, 1], scope='Conv2d_0b_1x1')
-          net = tf.concat(axis=3, values=[branch_0, branch_1, branch_2, branch_3])
+          net = tf.concat(axis=1, values=[branch_0, branch_1, branch_2, branch_3])
         end_points[end_point] = net
         if final_endpoint == end_point: return net, end_points
 
@@ -222,7 +224,7 @@ def inception_v1_base(inputs,
           with tf.variable_scope('Branch_3'):
             branch_3 = slim.max_pool2d(net, [3, 3], scope='MaxPool_0a_3x3')
             branch_3 = slim.conv2d(branch_3, 128, [1, 1], scope='Conv2d_0b_1x1')
-          net = tf.concat(axis=3, values=[branch_0, branch_1, branch_2, branch_3])
+          net = tf.concat(axis=1, values=[branch_0, branch_1, branch_2, branch_3])
         end_points[end_point] = net
         if final_endpoint == end_point: return net, end_points
 
@@ -239,7 +241,7 @@ def inception_v1_base(inputs,
           with tf.variable_scope('Branch_3'):
             branch_3 = slim.max_pool2d(net, [3, 3], scope='MaxPool_0a_3x3')
             branch_3 = slim.conv2d(branch_3, 128, [1, 1], scope='Conv2d_0b_1x1')
-          net = tf.concat(axis=3, values=[branch_0, branch_1, branch_2, branch_3])
+          net = tf.concat(axis=1, values=[branch_0, branch_1, branch_2, branch_3])
         end_points[end_point] = net
         if final_endpoint == end_point: return net, end_points
     raise ValueError('Unknown final endpoint %s' % final_endpoint)
@@ -289,13 +291,13 @@ def inception_v1(inputs,
                         is_training=is_training):
       net, end_points = inception_v1_base(inputs, scope=scope)
       with tf.variable_scope('Logits'):
-        net = slim.avg_pool2d(net, [7, 7], stride=1, scope='AvgPool_0a_7x7')
+        net = slim.avg_pool2d(net, [7, 7], stride=1, scope='AvgPool_0a_7x7', data_format="NCHW")
         net = slim.dropout(net,
                            dropout_keep_prob, scope='Dropout_0b')
         logits = slim.conv2d(net, num_classes, [1, 1], activation_fn=None,
-                             normalizer_fn=None, scope='Conv2d_0c_1x1')
+                             normalizer_fn=None, scope='Conv2d_0c_1x1', data_format="NCHW")
         if spatial_squeeze:
-          logits = tf.squeeze(logits, [1, 2], name='SpatialSqueeze')
+          logits = tf.squeeze(logits, [2, 3], name='SpatialSqueeze')
 
         end_points['Logits'] = logits
         end_points['Predictions'] = prediction_fn(logits, scope='Predictions')
