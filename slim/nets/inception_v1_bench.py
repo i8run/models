@@ -41,6 +41,7 @@ import time
 
 from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
+sys.path.append("/home/arda/yuan.liu/models/slim")
 from nets import inception_v1
 
 FLAGS = None
