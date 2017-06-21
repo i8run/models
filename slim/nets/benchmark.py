@@ -99,7 +99,7 @@ def time_tensorflow_run(session, target, images_placeholder, labels_placeholder,
     _ = session.run(target, feed_dict=feed_dict)
     duration = time.time() - start_time
     if i >= num_steps_burn_in:
-      if not i % 10:
+      #if not i % 10:
         #print ('%s: step %d, duration = %.3f' %
         #       (datetime.now(), i - num_steps_burn_in, duration))
       total_duration += duration
