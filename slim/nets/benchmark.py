@@ -100,8 +100,8 @@ def time_tensorflow_run(session, target, images_placeholder, labels_placeholder,
     duration = time.time() - start_time
     if i >= num_steps_burn_in:
       if not i % 10:
-        print ('%s: step %d, duration = %.3f' %
-               (datetime.now(), i - num_steps_burn_in, duration))
+        #print ('%s: step %d, duration = %.3f' %
+        #       (datetime.now(), i - num_steps_burn_in, duration))
       total_duration += duration
       total_duration_squared += duration * duration
   mn = total_duration / opts.num_batches
@@ -202,5 +202,9 @@ if __name__ == '__main__':
     elif opts.model_type=='resnet_v2_200':
         from nets.resnet_v2 import resnet_v2_200 as inference
         ResNet = True
+    elif opts.model_type=='vgg_16':
+        from nets.vgg import vgg_16 as inference
+    elif opts.model_type=='vgg_19':
+        from nets.vgg import vgg_19 as inference
     run_benchmark()
 
