@@ -33,18 +33,33 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import argparse
+import optparse
 from datetime import datetime
 import math
 import sys
 import time
+import numpy as np
 
 from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
 sys.path.append("/home/arda/yuan.liu/models/slim")
-from nets import inception_v1
+from nets.inception_v1 import inception_v1 as inference
+opts=None
 
-FLAGS = None
+def placeholder_inputs():
+  """Generate placeholder variables to represent the input tensors.
+  These placeholders are used as inputs by the rest of the model building
+  code.
+  """
+  batch_size = opts.batch_size
+  image_size = opts.image_size
+  images_placeholder = tf.placeholder(tf.float32, shape=(batch_size,
+                                                        image_size,
+                                                        image_size,
+                                                        3))
+  labels_placeholder = tf.placeholder(tf.int32, shape=(batch_size))
+  return images_placeholder, labels_placeholder
+
 
 def loss(logits, labels):
     batch_size = tf.size(labels)
@@ -58,10 +73,7 @@ def loss(logits, labels):
     loss = tf.reduce_mean(cross_entropy, name='xentropy_mean')
     return loss
 
-def print_activations(t):
-  print(t.op.name, ' ', t.get_shape().as_list())
-
-def time_tensorflow_run(session, target, info_string):
+def time_tensorflow_run(session, target, images_placeholder, labels_placeholder, info_string):
   """Run the computation to obtain the target tensor and print timing stats.
 
   Args:
@@ -75,9 +87,17 @@ def time_tensorflow_run(session, target, info_string):
   num_steps_burn_in = 10
   total_duration = 0.0
   total_duration_squared = 0.0
-  for i in xrange(FLAGS.num_batches + num_steps_burn_in):
+  batch_size = opts.batch_size
+  image_size = opts.image_size
+  for i in xrange(opts.num_batches + num_steps_burn_in):
+    # Feed dictionaray
+    feed_dict = {
+        images_placeholder : np.random.randn(batch_size,image_size,image_size,3)*1e-1,
+        labels_placeholder : np.ones(batch_size),
+    }
+
     start_time = time.time()
-    _ = session.run(target)
+    _ = session.run(target, feed_dict=feed_dict)
     duration = time.time() - start_time
     if i >= num_steps_burn_in:
       if not i % 10:
@@ -85,73 +105,64 @@ def time_tensorflow_run(session, target, info_string):
                (datetime.now(), i - num_steps_burn_in, duration))
       total_duration += duration
       total_duration_squared += duration * duration
-  mn = total_duration / FLAGS.num_batches
-  vr = total_duration_squared / FLAGS.num_batches - mn * mn
+  mn = total_duration / opts.num_batches
+  vr = total_duration_squared / opts.num_batches - mn * mn
   sd = math.sqrt(vr)
   print ('%s: %s across %d steps, %.3f +/- %.3f sec / batch' %
-         (datetime.now(), info_string, FLAGS.num_batches, mn, sd))
+         (datetime.now(), info_string, opts.num_batches, mn, sd))
 
 def run_benchmark():
   """Run the benchmark on Inception_V1."""
   with tf.Graph().as_default():
     # Generate some dummy images.
-    image_size = 224
+    image_size = opts.image_size
     # Note that our padding definition is slightly different the cuda-convnet.
     # In order to force the model to start with the same activations sizes,
     # we add 3 to the image_size and employ VALID padding above.
-    images = tf.Variable(tf.random_normal([FLAGS.batch_size,
-                                           image_size,
-                                           image_size, 3],
-                                          dtype=tf.float32,
-                                          stddev=1e-1), trainable=False)
-
-    labels = tf.Variable(tf.ones([FLAGS.batch_size],
-                                 dtype=tf.int32), trainable=False)
-
+    images_placeholder, labels_placeholder = placeholder_inputs()
     # Build a Graph that computes the logits predictions from the
     # inference model.
-    logits, end_points = inception_v1.inception_v1(images)
+    logits, _ = inference(images_placeholder)
+
+    # Get loss function
+    objective = loss(logits, labels_placeholder)
+
+    # Get train option
+    learning_rate = 0.001
+    optimizer = tf.train.GradientDescentOptimizer(learning_rate)
+    train_op = optimizer.minimize(objective)
+
     # Build an initialization operation.
     init = tf.global_variables_initializer()
 
-    # Start running operations on the Graph.
-    config = tf.ConfigProto()
     # config.gpu_options.allocator_type = 'BFC'
-    sess = tf.Session(config=config)
+    sess = tf.Session()
     sess.run(init)
 
     # Run the forward benchmark.
-    time_tensorflow_run(sess, logits, "Forward")
+    time_tensorflow_run(sess, logits, images_placeholder, labels_placeholder,"Forward")
 
-    # Add a simple objective so we can calculate the backward pass.
-    objective = loss(logits, labels)
-
-    # Variables to train.
-    variables_to_train = tf.trainable_variables()
-
-    # Compute the gradient with respect to all the parameters.
-    grad = tf.gradients(objective, variables_to_train)
     # Run the backward benchmark.
-    time_tensorflow_run(sess, grad, "Forward-backward")
-
-
-def main(_):
-  run_benchmark()
+    time_tensorflow_run(sess, train_op, images_placeholder, labels_placeholder, "Forward-backward")
 
 
 if __name__ == '__main__':
-  parser = argparse.ArgumentParser()
-  parser.add_argument(
-      '--batch_size',
-      type=int,
-      default=128,
-      help='Batch size.'
-  )
-  parser.add_argument(
-      '--num_batches',
-      type=int,
-      default=100,
-      help='Number of batches to run.'
-  )
-  FLAGS, unparsed = parser.parse_known_args()
-  tf.app.run(main=main, argv=[sys.argv[0]] + unparsed)
+    optparser = optparse.OptionParser()
+    optparser.add_option(
+        "--batch_size", default=32,
+        help="batch_size"
+    )
+    optparser.add_option(
+        "--num_batches", default=100,
+         help="number of batches to run"
+    )
+    optparser.add_option(
+        "--image_size", default=224,
+         help="size of image defaut is 224"
+    )
+    optparser.add_option(
+        "--learning_rate", default=0.001,
+    )
+    opts = optparser.parse_args()[0]
+    run_benchmark()
+
