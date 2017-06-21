@@ -42,8 +42,7 @@ import numpy as np
 
 from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
-sys.path.append("/home/arda/yuan.liu/models/slim")
-from nets.inception_v1 import inception_v1 as inference
+sys.path.append("/home/yuan/Desktop/models/slim")
 opts=None
 
 def placeholder_inputs():
@@ -163,6 +162,17 @@ if __name__ == '__main__':
     optparser.add_option(
         "--learning_rate", default=0.001,
     )
+    optparser.add_option(
+        "--model_type", default='inception_v1',
+    )
     opts = optparser.parse_args()[0]
+    if opts.model_type=='inception_v1':
+        from nets.inception_v1 import inception_v1 as inference
+    elif opts.model_type=='inception_v2':
+        from nets.inception_v2 import inception_v2 as inference
+    elif opts.model_type=='inception_v3':
+        from nets.inception_v3 import inception_v3 as inference
+    elif opts.model_type=='alexnet':
+        from nets.alexnet import alexnet_v2 as inference
     run_benchmark()
 
