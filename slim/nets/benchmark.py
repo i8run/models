@@ -42,7 +42,7 @@ import numpy as np
 
 from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
-sys.path.append("/home/yuan/Desktop/models/slim")
+sys.path.append("/home/arda/yuan.liu/models/slim")
 opts=None
 
 def placeholder_inputs():
@@ -121,7 +121,10 @@ def run_benchmark():
     images_placeholder, labels_placeholder = placeholder_inputs()
     # Build a Graph that computes the logits predictions from the
     # inference model.
-    logits, _ = inference(images_placeholder)
+    if not ResNet:
+        logits, _ = inference(images_placeholder)
+    else:
+        logits, _ = inference(images_placeholder, num_classes = 1000)
 
     # Get loss function
     objective = loss(logits, labels_placeholder)
@@ -144,6 +147,7 @@ def run_benchmark():
     # Run the backward benchmark.
     time_tensorflow_run(sess, train_op, images_placeholder, labels_placeholder, "Forward-backward")
 
+ResNet = False
 
 if __name__ == '__main__':
     optparser = optparse.OptionParser()
@@ -176,19 +180,27 @@ if __name__ == '__main__':
         from nets.alexnet import alexnet_v2 as inference
     elif opts.model_type=='resnet_v1_50':
         from nets.resnet_v1 import resnet_v1_50 as inference
+        ResNet = True
     elif opts.model_type=='resnet_v1_101':
         from nets.resnet_v1 import resnet_v1_101 as inference
+        ResNet = True
     elif opts.model_type=='resnet_v1_152':
         from nets.resnet_v1 import resnet_v1_152 as inference
+        ResNet = True
     elif opts.model_type=='resnet_v1_200':
         from nets.resnet_v1 import resnet_v1_200 as inference
+        ResNet = True
     elif opts.model_type=='resnet_v2_50':
-        from nets.resnet_v2 import resnet_v2_50 as inference
+        from nets.resnet_v2 import resnet_v2git s_50 as inference
+        ResNet = True
     elif opts.model_type=='resnet_v2_101':
         from nets.resnet_v2 import resnet_v2_101 as inference
+        ResNet = True
     elif opts.model_type=='resnet_v2_152':
         from nets.resnet_v2 import resnet_v2_152 as inference
+        ResNet = True
     elif opts.model_type=='resnet_v2_200':
         from nets.resnet_v2 import resnet_v2_200 as inference
+        ResNet = True
     run_benchmark()
 
