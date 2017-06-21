@@ -1,6 +1,18 @@
 #!/bin/sh
-#echo 'resnet_v1_50'
-#python nets/benchmark.py --model_type resnet_v1_50
+echo 'inception_v1'
+python nets/benchmark.py --model_type inception_v1
+
+echo 'inception_v2'
+python nets/benchmark.py --model_type inception_v2
+
+echo 'inception_v3'
+python nets/benchmark.py --model_type inception_v3
+
+echo 'alexnet_v2'
+python nets/benchmark.py --model_type alexnet_v2
+
+echo 'resnet_v1_50'
+python nets/benchmark.py --model_type resnet_v1_50
 
 echo 'resnet_v1_101'
 python nets/benchmark.py --model_type resnet_v1_101

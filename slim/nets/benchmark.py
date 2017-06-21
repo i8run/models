@@ -176,7 +176,7 @@ if __name__ == '__main__':
         from nets.inception_v2 import inception_v2 as inference
     elif opts.model_type=='inception_v3':
         from nets.inception_v3 import inception_v3 as inference
-    elif opts.model_type=='alexnet':
+    elif opts.model_type=='alexnet_v2':
         from nets.alexnet import alexnet_v2 as inference
     elif opts.model_type=='resnet_v1_50':
         from nets.resnet_v1 import resnet_v1_50 as inference
