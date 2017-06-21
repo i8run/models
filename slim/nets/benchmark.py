@@ -174,5 +174,21 @@ if __name__ == '__main__':
         from nets.inception_v3 import inception_v3 as inference
     elif opts.model_type=='alexnet':
         from nets.alexnet import alexnet_v2 as inference
+    elif opts.model_type=='resnet_v1_50':
+        from nets.resnet_v1 import resnet_v1_50 as inference
+    elif opts.model_type=='resnet_v1_101':
+        from nets.resnet_v1 import resnet_v1_101 as inference
+    elif opts.model_type=='resnet_v1_152':
+        from nets.resnet_v1 import resnet_v1_152 as inference
+    elif opts.model_type=='resnet_v1_200':
+        from nets.resnet_v1 import resnet_v1_200 as inference
+    elif opts.model_type=='resnet_v2_50':
+        from nets.resnet_v2 import resnet_v2_50 as inference
+    elif opts.model_type=='resnet_v2_101':
+        from nets.resnet_v2 import resnet_v2_101 as inference
+    elif opts.model_type=='resnet_v2_152':
+        from nets.resnet_v2 import resnet_v2_152 as inference
+    elif opts.model_type=='resnet_v2_200':
+        from nets.resnet_v2 import resnet_v2_200 as inference
     run_benchmark()
 
