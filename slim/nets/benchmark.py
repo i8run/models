@@ -191,7 +191,7 @@ if __name__ == '__main__':
         from nets.resnet_v1 import resnet_v1_200 as inference
         ResNet = True
     elif opts.model_type=='resnet_v2_50':
-        from nets.resnet_v2 import resnet_v2git s_50 as inference
+        from nets.resnet_v2 import resnet_v2_50 as inference
         ResNet = True
     elif opts.model_type=='resnet_v2_101':
         from nets.resnet_v2 import resnet_v2_101 as inference
