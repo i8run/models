@@ -42,8 +42,10 @@ import numpy as np
 
 from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
-sys.path.append("/home/arda/yuan.liu/models/slim")
 opts=None
+
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 def placeholder_inputs():
   """Generate placeholder variables to represent the input tensors.
@@ -107,8 +109,8 @@ def time_tensorflow_run(session, target, images_placeholder, labels_placeholder,
   mn = total_duration / opts.num_batches
   vr = total_duration_squared / opts.num_batches - mn * mn
   sd = math.sqrt(vr)
-  print ('%s: %s across %d steps, %.3f +/- %.3f sec / batch' %
-         (datetime.now(), info_string, opts.num_batches, mn, sd))
+  print ('%s: %s across %d steps, %.3f +/- %.3f sec / batch, throughput is %.3f' %
+         (datetime.now(), info_string, opts.num_batches, mn, sd, opts.batch_size/mn))
 
 def run_benchmark():
   """Run the benchmark on Inception_V1."""
@@ -152,22 +154,22 @@ ResNet = False
 if __name__ == '__main__':
     optparser = optparse.OptionParser()
     optparser.add_option(
-        "--batch_size", default=32,
+        "--batch_size", default=128, type="int",
         help="batch_size"
     )
     optparser.add_option(
-        "--num_batches", default=100,
+        "--num_batches", default=100, type="int",
          help="number of batches to run"
     )
     optparser.add_option(
-        "--image_size", default=224,
+        "--image_size", default=224, type="int",
          help="size of image defaut is 224"
     )
     optparser.add_option(
-        "--learning_rate", default=0.001,
+        "--learning_rate", default=0.001, type="float",
     )
     optparser.add_option(
-        "--model_type", default='inception_v1',
+        "--model_type", default='inception_v1'
     )
     opts = optparser.parse_args()[0]
     if opts.model_type=='inception_v1':
